@@ -10,6 +10,7 @@ import (
 	"github.com/panditvishnuu/userservice/internal/config"
 	"github.com/panditvishnuu/userservice/internal/repository"
 	"github.com/panditvishnuu/userservice/internal/repository/postgres"
+	"github.com/panditvishnuu/userservice/internal/service"
 )
 
 func main() {
@@ -57,6 +58,12 @@ func main() {
 			"attempts", cfg.DBPingAttempts,
 			"last_error", err,
 		)
+		os.Exit(1)
+	}
+
+	s, err := service.NewUserService(repo, cfg.JWTSecret, cfg.JWTExpiration)
+	if err != nil {
+		slog.Error("failed to initialize user service", "error", err)
 		os.Exit(1)
 	}
 
