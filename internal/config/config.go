@@ -32,6 +32,8 @@ type Config struct {
 	DBPingTimeout      int
 	DBPingAttempts     int
 	DBPingDelaySeconds int
+
+	ShutdownTimeout int
 }
 
 // Now load all the secrets from env variables
@@ -59,6 +61,8 @@ func LoadConfig() (*Config, error) {
 	cfg.DBPingTimeout = getEnvIntOrDefault("DB_PING_TIMEOUT", 5)
 	cfg.DBPingAttempts = getEnvIntOrDefault("DB_PING_ATTEMPTS", 3)
 	cfg.DBPingDelaySeconds = getEnvIntOrDefault("DB_DELAY_SECONDS", 2)
+
+	cfg.ShutdownTimeout = getEnvIntOrDefault("SHUT_DOWN_TIMEOUT", 30)
 
 	if len(missing) > 0 {
 		return nil, fmt.Errorf("missing required env variables %v", missing)
