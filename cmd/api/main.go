@@ -8,8 +8,10 @@ import (
 	"time"
 
 	"github.com/panditvishnuu/userservice/internal/config"
+	"github.com/panditvishnuu/userservice/internal/handler"
 	"github.com/panditvishnuu/userservice/internal/repository"
 	"github.com/panditvishnuu/userservice/internal/repository/postgres"
+	"github.com/panditvishnuu/userservice/internal/server"
 	"github.com/panditvishnuu/userservice/internal/service"
 )
 
@@ -64,6 +66,14 @@ func main() {
 	s, err := service.NewUserService(repo, cfg.JWTSecret, cfg.JWTExpiration)
 	if err != nil {
 		slog.Error("failed to initialize user service", "error", err)
+		os.Exit(1)
+	}
+
+	userHandler := handler.NewUserHandler(s)
+	srv := server.New(cfg, userHandler)
+
+	if err := srv.Run(); err != nil {
+		slog.Error("server exited with error", "error", err)
 		os.Exit(1)
 	}
 
