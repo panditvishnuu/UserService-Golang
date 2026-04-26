@@ -72,10 +72,9 @@ func main() {
 	userHandler := handler.NewUserHandler(s)
 	srv := server.New(cfg, userHandler)
 
+	slog.Info("application started successfully")
 	if err := srv.Run(); err != nil {
 		slog.Error("server exited with error", "error", err)
 		os.Exit(1)
 	}
-
-	slog.Info("application started successfully")
 }
