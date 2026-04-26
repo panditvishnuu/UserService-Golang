@@ -1,0 +1,44 @@
+# docker-compose.yml
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: userservice
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d userservice"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  user-service:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: userservice
+      DB_SSL_MODE: disable
+      JWT_SECRET: dev-secret-change-in-production
+      JWT_EXPIRATION_HOURS: 24
+      DB_PING_ATTEMPTS: 5
+      DB_PING_DELAY_SECONDS: 2
+      DB_PING_TIMEOUT: 5
+      SHUTDOWN_TIMEOUT: 30
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
